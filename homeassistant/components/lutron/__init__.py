@@ -153,19 +153,13 @@ class LutronButton:
         button.subscribe(self.button_callback, None)
 
     def button_callback(self, button, context, event, params):
-        """Fire an event about a button being pressed or released."""
-        # Events per button type:
-        #   RaiseLower -> pressed/released
-        #   SingleAction -> single
-        action = None
-        if self._has_release_event:
-            if event == Button.Event.PRESSED:
-                action = "pressed"
-            else:
-                action = "released"
-        elif event == Button.Event.PRESSED:
-            action = "single"
+        """Fire an event about a button being press, release, hold, etc."""
 
-        if action:
-            data = {ATTR_ID: self._id, ATTR_ACTION: action, ATTR_FULL_ID: self._full_id}
+        ev_map = {
+            Button.Event.PRESS: "pressed",
+            Button.Event.RELEASE: "released"
+        }
+
+        if event in ev_map:
+            data = {ATTR_ID: self._id, ATTR_ACTION: ev_map[event], ATTR_FULL_ID: self._full_id}
             self._hass.bus.fire(self._event, data)
